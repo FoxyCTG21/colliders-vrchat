@@ -1,0 +1,62 @@
+using UnityEngine;
+using VRC.SDKBase;
+using System.Collections;
+
+using UdonSharp;
+
+
+public class PlayerColliderActivator : UdonSharpBehaviour
+{
+    // Array para almacenar los nombres de usuario
+    [SerializeField]
+    private string[] players;
+    [SerializeField]
+    private Collider[] colliders;
+    private bool IsVip =false;
+
+    // Método Start se ejecuta al inicio del juego
+    void Start()
+    {
+        // Llamar al método ActivateCollidersDelayed después de un retraso de frames
+        SendCustomEventDelayedSeconds("ActivateColliders", 5);
+    }
+
+    // Método coroutine para activar los SphereColliders después de un retraso
+    public void ActivateColliders()
+    {
+        
+
+        // Bucle for para iterar a través de todos los jugadores
+        for (int i = 0; i < players.Length; i++)
+        {
+            // Obtener el nombre del jugador actual en la iteración
+            string currentPlayerName = players[i];
+
+            // Comparar el nombre del jugador actual con el nombre del jugador en la red
+            if (currentPlayerName == Networking.LocalPlayer.displayName)
+            {
+                // Activar los SphereColliders de los collares
+                IsVip = true;
+                break;
+            }
+            
+        }
+        ActivateSphereColliders(colliders);
+    }
+
+    // Método para activar los SphereColliders de los collares
+    void ActivateSphereColliders(Collider[] colliders)
+    {
+        // Iterar a través de los colliders y activar sus SphereColliders
+        foreach (Collider collider in colliders)
+        {
+            
+            if (collider != null)
+            {
+                collider.gameObject.SetActive(IsVip);
+            }
+        }
+    }
+
+    
+}
