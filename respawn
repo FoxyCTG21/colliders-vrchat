@@ -1,0 +1,47 @@
+using UdonSharp;
+using UnityEngine;
+using VRC.SDKBase;
+using VRC.Udon;
+
+public class ObjectRespawner : UdonSharpBehaviour // Asegúrate de que esto coincida con el nombre del archivo .cs
+{
+    public GameObject[] objectsToRespawn; // Referencia a los objetos que quieres hacer respawn
+    public Vector3[] initialPositions; // Las posiciones iniciales de los objetos
+    public Quaternion[] initialRotations; // Las rotaciones iniciales de los objetos
+
+    void Start()
+    {
+        // Aquí asegúrate de que la longitud de los arrays de objetos y sus transformaciones iniciales coinciden
+        if(objectsToRespawn.Length != initialPositions.Length || objectsToRespawn.Length != initialRotations.Length)
+        {
+            Debug.LogError("Los arrays de objetos y transformaciones iniciales no coinciden en longitud.");
+        }
+    }
+
+    public override void Interact()
+    {
+        // Este método se llamará cuando un jugador interactúe con este objeto (presionando el botón).
+        RespawnObjects();
+    }
+
+    private void RespawnObjects()
+    {
+        for(int i = 0; i < objectsToRespawn.Length; i++)
+        {
+            // Asegúrate de que hay un objeto para respawnear y una posición/rotación inicial para él
+            if(objectsToRespawn[i] != null && i < initialPositions.Length && i < initialRotations.Length)
+            {
+                objectsToRespawn[i].transform.position = initialPositions[i];
+                objectsToRespawn[i].transform.rotation = initialRotations[i];
+
+                // Si el objeto tiene un Rigidbody, también podrías querer resetear su velocidad
+                Rigidbody rb = objectsToRespawn[i].GetComponent<Rigidbody>();
+                if(rb != null)
+                {
+                    rb.velocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                }
+            }
+        }
+    }
+}
